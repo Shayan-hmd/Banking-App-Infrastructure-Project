@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  core-api-customer:
+    build:
+      context: ./BackEnd/Customer/core-api-customer
+    container_name: core-api-customer     
+    ports:
+      - "9091:9091"
+    environment:
+      DATAACCESS_MS_CUSTOMER_URL: http://data_access_customer:9090
+    networks:
+      - banking-network
+  data_access_customer:
+    build:
+      context: ./BackEnd/Customer/data_access_customer
+    container_name: data_access_customer
+    networks:
+      - banking-network
+#   postgres:
+#     image: postgres:15-alpine
+#     container_name: banking-postgres
+#     environment:
+#       POSTGRES_USER: postgres
+#       POSTGRES_PASSWORD: admin123
+#       POSTGRES_DB: postgres  
+#     ports:
+#       - "5433:5432"
+#     volumes:
+#       - postgres_data:/var/lib/postgresql/data
+#     networks:
+#       - banking-network
+
+# volumes:
+#   postgres_data:
+#     external: true
+#     name: database_postgres_data
+
+networks:
+  banking-network:
+    driver: bridge
