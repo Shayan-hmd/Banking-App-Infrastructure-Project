@@ -19,7 +19,7 @@ public class MainResource {
     }
 
     @GetMapping("/customerDetails")
-    public GenericDTO hello(@Valid GetCustomerDetailsRequestDTO requestDTO){
+    public GenericDTO getCustomerDetails(@Valid GetCustomerDetailsRequestDTO requestDTO){
         return customerDetailsService.getCustomerDetailsService(requestDTO);
     }
 }
