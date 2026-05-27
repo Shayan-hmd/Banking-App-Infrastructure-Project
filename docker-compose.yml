@@ -1,12 +1,20 @@
 version: '3.8'
 
 services:
+  api-gateway:
+    build:
+      context: ./Gateway/gateway
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    networks:
+      - banking-network
   core-api-customer:
     build:
       context: ./BackEnd/Customer/core-api-customer
     container_name: core-api-customer     
-    ports:
-      - "9091:9091"
+    # ports:
+    #   - "9091:9091"
     environment:
       DATAACCESS_MS_CUSTOMER_URL: http://data-access-customer:9090
     networks:

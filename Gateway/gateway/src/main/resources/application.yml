@@ -1,0 +1,11 @@
+server:
+  port: 8080
+
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: customer-core-api
+          uri: http://core-api-customer:9091
+          predicates:
+            - Path=/core-api-customer/**
