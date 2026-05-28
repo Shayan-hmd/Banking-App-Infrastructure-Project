@@ -25,6 +25,22 @@ services:
     container_name: data-access-customer
     networks:
       - banking-network
+  core-api-account:
+    build:
+      context: ./BackEnd/Account/core-api-account
+    container_name: core-api-account     
+    # ports:
+    #   - "9091:9091"
+    environment:
+      DATAACCESS_MS_ACCOUNT_URL: http://data-access-account:9090
+    networks:
+      - banking-network
+  data-access-account:
+    build:
+      context: ./BackEnd/Account/data_access_account
+    container_name: data-access-account
+    networks:
+      - banking-network
 #   postgres:
 #     image: postgres:15-alpine
 #     container_name: banking-postgres

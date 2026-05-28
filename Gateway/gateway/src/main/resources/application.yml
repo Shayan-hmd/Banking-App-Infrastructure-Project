@@ -9,3 +9,7 @@ spring:
           uri: http://core-api-customer:9091
           predicates:
             - Path=/core-api-customer/**
+        - id: account-core-api
+          uri: http://core-api-account:9091
+          predicates:
+            - Path=/core-api-account/**
