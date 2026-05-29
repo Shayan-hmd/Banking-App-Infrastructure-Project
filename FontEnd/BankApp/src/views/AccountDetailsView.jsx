@@ -15,22 +15,18 @@ export default function AccountDetailsView() {
       setRerender(r => r + 1);
     });
     
-    // ✅ ADD THIS: Subscribe to selectedAccount changes if you have it
-    // If you don't have a selectedAccount in model, you can use local state
-    // For now, just use local state for selected row
-    
     setLocalData(config.table.dataprop.value || []);
     
     return () => unsubData();
   }, []);
   
-  // Local state for selected account (since you might not have it in model)
+  // Local state for selected account
   const [selectedAccount, setSelectedAccount] = useState(null);
   
   // Handle row click
   const handleRowClick = (row) => {
     console.log("Selected account:", row);
-    setSelectedAccount(row);  // Update local state
+    setSelectedAccount(row);
     AccountDetailsHandler.onRowClick(row);
   };
   
@@ -41,6 +37,8 @@ export default function AccountDetailsView() {
       </div>
     );
   }
+  
+  const hasNoData = !localData || localData.length === 0;
   
   return (
     <div className="px-8 pb-8">
@@ -54,17 +52,21 @@ export default function AccountDetailsView() {
         </div>
       )}
       
+      {hasNoData && !config.table.isLoadingprop?.value && (
+        <div className="bg-blue-50 border border-blue-200 text-blue-700 p-4 rounded-lg text-center mb-6">
+          No account data available for this customer.
+        </div>
+      )}
       
-      
-     
+      {!hasNoData && (
         <Table
           key={rerender}
           columns={config.table.columnsprop.value}
           data={localData}
-          selectedRow={selectedAccount}  // Pass selected row
+          selectedRow={selectedAccount}
           onRowClick={handleRowClick}
         />
-      
+      )}
       
       <div className="mt-8">
         <button

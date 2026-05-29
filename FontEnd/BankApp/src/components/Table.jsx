@@ -3,7 +3,8 @@ import React from 'react'
 export default function Table({ columns, data, onRowClick, selectedRow = null }) {
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden">
-      <div className="bg-green-900 text-white">
+      {/* Header - Sticky at top */}
+      <div className="bg-green-900 text-white sticky top-0">
         <div className="grid" style={{ gridTemplateColumns: `repeat(${columns.length}, minmax(0, 1fr))` }}>
           {columns.map((column, index) => (
             <div key={index} className="px-6 py-3 font-bold text-left">
@@ -13,7 +14,8 @@ export default function Table({ columns, data, onRowClick, selectedRow = null })
         </div>
       </div>
       
-      <div className="divide-y divide-gray-200">
+      {/* ONLY CHANGE: Added fixed maxHeight and overflow-y-auto for scrollable body */}
+      <div className="divide-y divide-gray-200 overflow-y-auto" style={{ maxHeight: "316px" }}>
         {data && data.length > 0 ? (
           data.map((row, rowIndex) => {
             // Check if this row is selected (compare by accountId or id)

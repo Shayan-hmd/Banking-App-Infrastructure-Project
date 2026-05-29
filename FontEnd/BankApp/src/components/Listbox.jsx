@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default function Listbox({ title, items, onSelectItem, renderItem, maxHeight = "400px", selectedItem = null }) {
+export default function Listbox({ title, items, onSelectItem, renderItem, maxHeight = "244px", selectedItem = null }) {
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden">
       {title && (
@@ -9,6 +9,7 @@ export default function Listbox({ title, items, onSelectItem, renderItem, maxHei
         </div>
       )}
       
+      {/* ONLY CHANGE: Added fixed maxHeight and overflow-y-auto */}
       <div 
         className="divide-y divide-gray-200 overflow-y-auto"
         style={{ maxHeight: maxHeight }}
