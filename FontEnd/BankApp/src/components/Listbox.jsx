@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default function Listbox({ title, items, onSelectItem, renderItem, maxHeight = "400px" }) {
+export default function Listbox({ title, items, onSelectItem, renderItem, maxHeight = "400px", selectedItem = null }) {
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden">
       {title && (
@@ -14,17 +14,26 @@ export default function Listbox({ title, items, onSelectItem, renderItem, maxHei
         style={{ maxHeight: maxHeight }}
       >
         {items && items.length > 0 ? (
-          items.map((item, index) => (
-            <div
-              key={index}
-              onClick={() => onSelectItem && onSelectItem(item)}
-              className="px-6 py-4 hover:bg-gray-50 cursor-pointer transition duration-200"
-            >
-              {renderItem ? renderItem(item) : (
-                <div className="text-gray-800">{item}</div>
-              )}
-            </div>
-          ))
+          items.map((item, index) => {
+            // Check if this item is selected
+            const isSelected = selectedItem && selectedItem.customerId === item.customerId;
+            
+            return (
+              <div
+                key={index}
+                onClick={() => onSelectItem && onSelectItem(item)}
+                className={`px-6 py-4 cursor-pointer transition duration-200 ${
+                  isSelected 
+                    ? 'bg-green-300 border-l-4 border-green-900'  // Highlight selected row
+                    : 'hover:bg-gray-50'                          // Hover effect for non-selected
+                }`}
+              >
+                {renderItem ? renderItem(item) : (
+                  <div className="text-gray-800">{item}</div>
+                )}
+              </div>
+            );
+          })
         ) : (
           <div className="px-6 py-8 text-center text-gray-500">
             No items available

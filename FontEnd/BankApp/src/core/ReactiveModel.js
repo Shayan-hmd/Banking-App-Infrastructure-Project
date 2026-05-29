@@ -1,26 +1,43 @@
-// This makes data reactive like Vue's ref()
 export function ref(initialValue) {
   let value = initialValue;
   const listeners = new Set();
+  let updateId = 0;
   
-  return {
+  const reactiveRef = {
     get value() {
       return value;
     },
     set value(newValue) {
-      if (value !== newValue) {
-        value = newValue;
-        listeners.forEach(listener => listener(newValue));
-      }
+      value = newValue;
+      updateId++;
+      // Notify all listeners
+      listeners.forEach(listener => {
+        try {
+          listener(value);
+        } catch(e) {
+          console.error('Error in reactive listener:', e);
+        }
+      });
     },
     subscribe(listener) {
       listeners.add(listener);
+      // Return unsubscribe function
       return () => listeners.delete(listener);
+    },
+    forceUpdate() {
+      listeners.forEach(listener => {
+        try {
+          listener(value);
+        } catch(e) {
+          console.error('Error in force update:', e);
+        }
+      });
+    },
+    // Add a version number to track changes
+    get version() {
+      return updateId;
     }
   };
-}
-
-// For watching reactive changes
-export function watchEffect(callback) {
-  callback();
+  
+  return reactiveRef;
 }

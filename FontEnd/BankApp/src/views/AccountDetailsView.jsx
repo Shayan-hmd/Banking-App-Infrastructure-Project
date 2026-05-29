@@ -1,19 +1,38 @@
 import React, { useState, useEffect } from 'react';
-import { AccountDetailsConfig, AccountDetailsHandler } from '../stores/appStore';
+import { AccountDetailsModel, AccountDetailsConfig, AccountDetailsHandler } from '../stores/appStore';
 import Table from '../components/Table';
 
 export default function AccountDetailsView() {
   const [rerender, setRerender] = useState(0);
+  const [localData, setLocalData] = useState([]);
   const config = AccountDetailsConfig.componentProps;
   
   useEffect(() => {
-    const unsub = config.table.dataprop.subscribe(() => setRerender(r => r + 1));
+    // Subscribe to data changes
+    const unsubData = config.table.dataprop.subscribe((newValue) => {
+      console.log("Account data changed in model:", newValue);
+      setLocalData(newValue || []);
+      setRerender(r => r + 1);
+    });
     
-    // Load accounts
-    AccountDetailsHandler.loadAccounts();
+    // ✅ ADD THIS: Subscribe to selectedAccount changes if you have it
+    // If you don't have a selectedAccount in model, you can use local state
+    // For now, just use local state for selected row
     
-    return () => unsub();
+    setLocalData(config.table.dataprop.value || []);
+    
+    return () => unsubData();
   }, []);
+  
+  // Local state for selected account (since you might not have it in model)
+  const [selectedAccount, setSelectedAccount] = useState(null);
+  
+  // Handle row click
+  const handleRowClick = (row) => {
+    console.log("Selected account:", row);
+    setSelectedAccount(row);  // Update local state
+    AccountDetailsHandler.onRowClick(row);
+  };
   
   if (config.table.isLoadingprop?.value) {
     return (
@@ -35,11 +54,17 @@ export default function AccountDetailsView() {
         </div>
       )}
       
-      <Table
-        columns={config.table.columnsprop.value}
-        data={config.table.dataprop.value}
-        onRowClick={AccountDetailsHandler.onRowClick}
-      />
+      
+      
+     
+        <Table
+          key={rerender}
+          columns={config.table.columnsprop.value}
+          data={localData}
+          selectedRow={selectedAccount}  // Pass selected row
+          onRowClick={handleRowClick}
+        />
+      
       
       <div className="mt-8">
         <button

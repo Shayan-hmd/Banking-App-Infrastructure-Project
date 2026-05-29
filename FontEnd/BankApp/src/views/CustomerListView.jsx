@@ -1,23 +1,55 @@
 import React, { useState, useEffect } from 'react';
-import { CustomerListConfig, CustomerListHandler } from '../stores/appStore';
+import { CustomerListModel, CustomerListConfig, CustomerListHandler } from '../stores/appStore';
 import Listbox from '../components/Listbox';
+import Textbox from '../components/Textbox';
 
 export default function CustomerListView() {
   const [rerender, setRerender] = useState(0);
+  const [dataVersion, setDataVersion] = useState(0);
+  const [searchTextLocal, setSearchTextLocal] = useState("");
+  const [selectedCustomerId, setSelectedCustomerId] = useState(null); // ← ADD THIS for tracking selection
   const config = CustomerListConfig.componentProps;
   
   useEffect(() => {
-    const unsubSearch = config.searchInput.valueprop.subscribe(() => setRerender(r => r + 1));
-    const unsubItems = config.listbox.itemsprop.subscribe(() => setRerender(r => r + 1));
+    // Subscribe to itemsprop changes (when data loads)
+    const unsubItems = config.listbox.itemsprop.subscribe((newValue) => {
+      console.log("Itemsprop changed, new value:", newValue);
+      setDataVersion(v => v + 1);
+      setRerender(r => r + 1);
+    });
     
-    // Load initial data
-    CustomerListHandler.loadCustomers();
+    // ✅ Subscribe to selectedCustomer changes and update local state
+    const unsubSelected = CustomerListModel.selectedCustomer.subscribe((newValue) => {
+      console.log("Selected customer changed in model:", newValue);
+      setSelectedCustomerId(newValue?.customerId || null);
+      setRerender(r => r + 1);  // Force re-render
+    });
     
     return () => {
-      unsubSearch();
       unsubItems();
+      unsubSelected();
     };
   }, []);
+  
+  // Handle input change - update model
+  const handleSearchInputChange = (value) => {
+    setSearchTextLocal(value);
+  };
+  
+  // Handle customer selection - updates model
+  const handleSelectCustomer = (customer) => {
+    console.log("Customer selected:", customer);
+    CustomerListHandler.onSelectCustomer(customer);
+    // The subscription above will catch this and update local state
+  };
+  
+  // Get current selected customer from model for the Listbox
+  const selectedCustomer = CustomerListModel.selectedCustomer.value;
+  
+  console.log("Rendering - Selected customer ID:", selectedCustomerId);
+  console.log("Rendering - Selected customer:", selectedCustomer);
+  
+  const hasNoData = !config.listbox.itemsprop.value || config.listbox.itemsprop.value.length === 0;
   
   if (config.listbox.isLoadingprop?.value) {
     return (
@@ -42,12 +74,13 @@ export default function CustomerListView() {
       {/* Search Row */}
       <div className="flex gap-4 mb-6">
         <div className="flex-grow">
-          <input
-            type="text"
-            value={config.searchInput.valueprop.value}
-            onChange={(e) => CustomerListHandler.onSearchInputChange(e.target.value)}
+          <Textbox
+            label=""
+            noLabel={true}
+            value={searchTextLocal}
+            onChange={handleSearchInputChange}
+            onBlur={(value) => CustomerListHandler.onSearchInputChange(value)}
             placeholder={config.searchInput.placeholderprop}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-green-900 bg-white text-gray-900"
           />
         </div>
         
@@ -59,16 +92,19 @@ export default function CustomerListView() {
         </button>
       </div>
       
-      {/* Listbox */}
+      {/* Listbox - KEY includes selectedCustomerId to force re-render on selection */}
       <div className="mb-6">
         <Listbox
+          key={`${dataVersion}-${selectedCustomerId}`}  // ← CRITICAL: Forces re-render when selection changes!
           title={config.listbox.titleprop}
           items={config.listbox.itemsprop.value}
-          onSelectItem={(customer) => CustomerListHandler.onSelectCustomer(customer)}
+          selectedItem={selectedCustomer}
+          onSelectItem={handleSelectCustomer}
           renderItem={(customer) => (
             <div>
               <div className="font-bold text-gray-800">{customer.name}</div>
               <div className="text-sm text-gray-500">{customer.email}</div>
+              <div className="text-xs text-gray-400">Age: {customer.age}</div>
             </div>
           )}
         />
