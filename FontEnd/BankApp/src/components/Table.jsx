@@ -3,7 +3,6 @@ import React from 'react'
 export default function Table({ columns, data, onRowClick }) {
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden">
-      {/* Table Header */}
       <div className="bg-green-900 text-white">
         <div className="grid" style={{ gridTemplateColumns: `repeat(${columns.length}, minmax(0, 1fr))` }}>
           {columns.map((column, index) => (
@@ -14,7 +13,6 @@ export default function Table({ columns, data, onRowClick }) {
         </div>
       </div>
       
-      {/* Table Body */}
       <div className="divide-y divide-gray-200">
         {data && data.length > 0 ? (
           data.map((row, rowIndex) => (

@@ -1,17 +1,18 @@
 import React from 'react'
 
-export default function Listbox({ title, items, onSelectItem, renderItem }) {
+export default function Listbox({ title, items, onSelectItem, renderItem, maxHeight = "400px" }) {
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden">
-      {/* Header */}
       {title && (
         <div className="bg-green-900 text-white px-6 py-3">
           <h2 className="text-xl font-bold">{title}</h2>
         </div>
       )}
       
-      {/* List Items */}
-      <div className="divide-y divide-gray-200">
+      <div 
+        className="divide-y divide-gray-200 overflow-y-auto"
+        style={{ maxHeight: maxHeight }}
+      >
         {items && items.length > 0 ? (
           items.map((item, index) => (
             <div
@@ -26,7 +27,7 @@ export default function Listbox({ title, items, onSelectItem, renderItem }) {
           ))
         ) : (
           <div className="px-6 py-8 text-center text-gray-500">
-            
+            No items available
           </div>
         )}
       </div>

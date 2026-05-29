@@ -1,25 +1,43 @@
-import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom'
-import Navbar from './components/Navbar' 
-import Home from './pages/Home' 
-import CustomerList from './pages/CustomerList' 
-import CustomerDetails from './pages/CustomerDetails' 
-import AccountDetails from './pages/AccountDetails' 
-import './App.css'
+import React, { useState, useEffect } from 'react';
+import Navbar from './components/Navbar';
+import { subscribeToView, getCurrentView } from './core/ViewManager';
+import HomeView from './views/HomeView';
+import CustomerListView from './views/CustomerListView';
+import CustomerDetailsView from './views/CustomerDetailsView';
+import AccountDetailsView from './views/AccountDetailsView';
+import './App.css';
 
 function App() {
+  const [currentView, setCurrentView] = useState(getCurrentView());
+
+  useEffect(() => {
+    const unsubscribe = subscribeToView((view) => {
+      setCurrentView(view);
+    });
+    return unsubscribe;
+  }, []);
+
+  const renderView = () => {
+    switch (currentView?.name) {
+      case 'CustomerList':
+        return <CustomerListView />;
+      case 'CustomerDetails':
+        return <CustomerDetailsView />;
+      case 'AccountDetails':
+        return <AccountDetailsView />;
+      default:
+        return <HomeView />;
+    }
+  };
+
   return (
-    <Router>
-      <div className="min-h-screen bg-green-100 flex flex-col">
-        <Navbar />
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/customer-list" element={<CustomerList />} />
-            <Route path="/customer-details" element={<CustomerDetails />} />
-            <Route path="/account-details" element={<AccountDetails />} />
-          </Routes>
+    <div className="min-h-screen bg-green-100">
+      <Navbar />
+      <div className="pt-20">
+        {renderView()}
       </div>
-    </Router>
-  )
+    </div>
+  );
 }
 
-export default App
+export default App;
